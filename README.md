@@ -16,7 +16,7 @@ To run experiments use lazy_learning.ipynb
 
 ## Instructions
 
-NB// Actual prediction code is placed within src file
+NB// Actual prediction code is placed within src folder
 
 1. For training, three formatted csv files are expected, positive.csv, negative.csv and test.csv. Note that the last column in each file represents the class(+ve or -ve).
 
