@@ -1,0 +1,4 @@
+jupyter
+pandas==0.25.3
+pandas-profiling==2.3.0
+click==7.0
