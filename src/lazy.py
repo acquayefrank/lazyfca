@@ -58,15 +58,81 @@ def aggregation(df_positive, df_negative, threshold=0.2):
     return positive
 
 
-def predict(model, data_frame):
-    pass
+def predict(model, data, columns):
+    prediction = 'negative'
+    for attribute in model:
+        row = [data[key] for key in attribute]
+        attributes =[list(support) for support in model[attribute]]
+        for element in row:
+            for attr in attributes:
+                if element in attr:
+                    prediction = 'positive'
+    return prediction
 
 
-if __name__ == "__main__":
+def test_model(model, data_frame):
+    columns = list(data_frame.columns)
+
+    accuracy = 0
+    recall = 0
+    precision = 0
+    F1 = 0
+
+    true_positives = 0
+    false_negatives = 0
+    false_positives = 0
+    number_of_correct_predictions = 0
+
+    total_number_of_predictions = len(data_frame)
+    for index, row in data_frame.iterrows():
+        prediction = predict(model, row, columns)
+
+        if prediction == row.Class:
+            number_of_correct_predictions += 1
+        
+        if row.Class == 'positive' and prediction == 'positive':
+            true_positives += 1
+
+        if row.Class == 'positive' and prediction == 'negative':
+            false_negatives += 1
+
+        if row.Class == 'negative' and prediction == 'positive':
+            false_positives += 1
+
+    accuracy = number_of_correct_predictions/total_number_of_predictions
+    t_p_plus_f_n = true_positives + false_negatives
+    t_p_plus_f_p = true_positives +false_positives
+
+    if t_p_plus_f_n:
+        recall = true_positives/t_p_plus_f_n
+    
+    if t_p_plus_f_p:
+        precision = true_positives/t_p_plus_f_p
+
+    F1 = 2 * (precision * recall) / (precision + recall)
+
+    click.echo('accuracy = {}'.format(round(accuracy, 2)))
+    click.echo('recall = {}'.format(round(recall, 2)))
+    click.echo('precision = {}'.format(round(precision, 2)))
+    click.echo('F1 Score = {}'.format(round(F1, 2)))
+    click.echo("If you're happy with the test results run the script again with the flag --predict, else tweak the threshold for better results")
+
+
+def make_predictions(model, data_frame):
+    columns = list(data_frame.columns)
+    for index, row in data_frame.iterrows():
+        prediction = predict(model, row, columns)
+        data_frame.at[index,'Class'] = prediction
+    data_frame.to_csv('neutral.csv', index=False)
+
+
+@click.command()
+@click.option('--predict/--no-predict', default=False)
+def main(predict):
     now = datetime. now()
     current_time = now.strftime("%H:%M:%S")
-    print("lazy learner ", current_time)
-    print("Follow the instructions below, enter blank for defaults:")
+    click.echo("lazy learner  {}".format(current_time))
+    click.echo("Follow the instructions below, enter blank for defaults:")
 
     positive = click.prompt(
                 "\nEnter the name of the positive file (e.g positive.csv): ", 
@@ -95,5 +161,15 @@ if __name__ == "__main__":
     df_neutral = read_csv(neutral)
 
     model = aggregation(df_positive, df_negative)
+
+    if predict:
+        make_predictions(model, df_neutral)
+        click.echo("check neutral.csv file for results")
+    else:
+        test_model(model, df_test)
+
+
+if __name__ == "__main__":
+    main()
     
 
