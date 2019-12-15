@@ -109,7 +109,10 @@ def test_model(model, data_frame):
     if t_p_plus_f_p:
         precision = true_positives/t_p_plus_f_p
 
-    F1 = 2 * (precision * recall) / (precision + recall)
+    p_plus_r = precision + recall
+
+    if p_plus_r:
+        F1 = 2 * (precision * recall) / p_plus_r
 
     click.echo('accuracy = {}'.format(round(accuracy, 2)))
     click.echo('recall = {}'.format(round(recall, 2)))
