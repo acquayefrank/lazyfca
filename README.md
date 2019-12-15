@@ -30,8 +30,7 @@ NB// Actual prediction code is placed within src folder
 
 4. For convenience you can just replace the ones in this directory
 
-
-#### Improvements
+## Improvements
 
 * Cross Validation
 * Possible tests with other data sources
